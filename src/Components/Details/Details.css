@@ -1,5 +1,123 @@
-.details
-{
+.details {
     flex: 1;
-   
+    overflow-y: auto; /* Enable scrolling */
+
+    /* Customize scrollbar */
+    &::-webkit-scrollbar {
+        width: 6px; /* Smaller scrollbar width */
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2); /* Light transparent scrollbar thumb */
+        border-radius: 10px; /* Rounded scrollbar edges */
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: transparent; /* Transparent scrollbar track */
+    }
+
+    .user {
+        padding: 15px 10px; /* Reduced padding */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px; /* Reduced gap */
+        border-bottom: 1px solid #dddddd35;
+
+        img {
+            width: 80px; /* Reduced size */
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        h2 {
+            font-size: 16px; /* Reduced font size */
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 12px; /* Reduced font size */
+            font-weight: 300;
+            color: lightgray;
+        }
+    }
+
+    .info {
+        padding: 15px; /* Reduced padding */
+        gap: 20px; /* Reduced gap */
+        display: flex;
+        flex-direction: column;
+
+        .option {
+            .title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                span {
+                    font-size: 14px; /* Reduced font size */
+                    font-weight: bold;
+                }
+
+                img {
+                    width: 24px; /* Reduced size */
+                    height: 24px;
+                    background-color: rgba(17, 25, 40, 0.4);
+                    padding: 8px; /* Reduced padding */
+                    border-radius: 50%;
+                    cursor: pointer;
+                }
+            }
+
+            .photos {
+                display: flex;
+                flex-direction: column;
+                gap: 15px; /* Reduced gap */
+
+                .photoitem {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    .photo-details {
+                        display: flex;
+                        align-items: center;
+                        gap: 15px; /* Reduced gap */
+
+                        img {
+                            width: 30px; /* Reduced size */
+                            height: 30px;
+                            border-radius: 5px;
+                            object-fit: cover;
+                        }
+
+                        span {
+                            font-size: 12px; /* Reduced font size */
+                            color: lightgray;
+                            font-weight: 300;
+                        }
+                    }
+
+                    img {
+                        width: 16px; /* Reduced size for download icon */
+                        height: 16px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+    button {
+        background-color: #ff4d4d;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 15px; 
+        margin-top: 20px; 
+        margin-left: 30px;
+    }
 }
