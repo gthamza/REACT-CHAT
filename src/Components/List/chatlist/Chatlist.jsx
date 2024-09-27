@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import './chatlist.css';
+import Adduser from './adduser/Adduser';
 
 
 function Chatlist() {
@@ -52,6 +53,7 @@ function Chatlist() {
           <p>hello</p>
         </div>
       </div>
+      {addModel && <Adduser></Adduser>}
     </div>
   )
 }
