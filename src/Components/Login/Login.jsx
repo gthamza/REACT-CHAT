@@ -11,6 +11,9 @@ function Login() {
     file: null,
     URL: ''
   });
+     
+  const [loading,setloading] = useState(false);
+
 
   const handleAvatar = (e) => {
     if (e.target.files[0]) {
@@ -23,6 +26,7 @@ function Login() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setloading(true)
     const formData = new FormData(e.target);
     const username = formData.get('username');
     const email = formData.get('email');
@@ -71,6 +75,9 @@ function Login() {
       console.error(err);
       toast.error('Login failed. Please check your credentials.');
     }
+    finally{
+      setloading(false);
+    }
   };
 
   return (
@@ -80,7 +87,9 @@ function Login() {
         <form onSubmit={handleLogin}>
           <input type='text' placeholder='email' name='email' />
           <input type='password' name='password' placeholder='password' />
-          <button>Login</button>
+          <button disabled = {loading}>
+          {loading ? "loading" : "LOGIN"}
+          </button>
         </form>
       </div>
       <div className='separator'></div>
@@ -99,7 +108,7 @@ function Login() {
           <input type='text' placeholder='username' name='username' />
           <input type='text' placeholder='email' name='email' />
           <input type='password' name='password' placeholder='password' />
-          <button>Sign UP</button>
+          <button disabled={loading}>{loading ? "loading" : "Sign UP"}</button>
         </form>
       </div>
     </div>
