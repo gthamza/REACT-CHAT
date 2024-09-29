@@ -1,5 +1,7 @@
 import React from 'react'
 import './Details.css'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../../lib/firebase'
 
 function Details() {
   return (
@@ -78,7 +80,7 @@ function Details() {
           <img src="./arrowDown.png" alt="" />
         </div>
        <center><button>Blocked User</button></center> 
-        <center><button className='logout'>LOGOUT</button></center>
+        <center><button className='logout' onClick={()=>auth.signOut()}>LOGOUT</button></center>
       </div>
     </div>
 
