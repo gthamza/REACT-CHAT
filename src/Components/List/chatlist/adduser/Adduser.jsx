@@ -39,40 +39,78 @@ function Adduser() {
     try {
       const chatRef = collection(db, "chats");
       const newChatRef = doc(chatRef);
-      const userChatRef = doc(collection(db, "userchats"), newChatRef.id);
   
+      // Create a new chat document
+      const userChatRef = doc(collection(db, "userchats"), newChatRef.id);
       await setDoc(userChatRef, {
         createdAt: serverTimestamp(),
         message: [],
       });
   
-      await updateDoc(doc(db, "userchats", user.id), {
-        chats: arrayUnion({
-          chatID: newChatRef.id,
-          lastMessage: "",
-          receiverID: currentUser.id,
-          updatedAt: new Date(),
-        }),
-      });
+      // Check if user chat exists for the searched user, if not create it
+      const userChatDocRef = doc(db, "userchats", user.id);
+      const userChatSnap = await getDocs(query(collection(db, "userchats"), where("__name__", "==", user.id)));
   
-      await updateDoc(doc(db, "userchats", currentUser.id), {
-        chats: arrayUnion({
-          chatID: newChatRef.id,
-          lastMessage: "",
-          receiverID: user.id,
-          updatedAt: new Date(),
-        }),
-      });
+      if (!userChatSnap.empty) {
+        // If document exists, update it
+        await updateDoc(userChatDocRef, {
+          chats: arrayUnion({
+            chatID: newChatRef.id,
+            lastMessage: "",
+            receiverID: currentUser.id,
+            updatedAt: new Date(),
+          }),
+        });
+      } else {
+        // If document doesn't exist, create it with setDoc
+        await setDoc(userChatDocRef, {
+          chats: [
+            {
+              chatID: newChatRef.id,
+              lastMessage: "",
+              receiverID: currentUser.id,
+              updatedAt: new Date(),
+            },
+          ],
+        });
+      }
+  
+      // Check if user chat exists for the current user, if not create it
+      const currentUserChatDocRef = doc(db, "userchats", currentUser.id);
+      const currentUserChatSnap = await getDocs(query(collection(db, "userchats"), where("__name__", "==", currentUser.id)));
+  
+      if (!currentUserChatSnap.empty) {
+        await updateDoc(currentUserChatDocRef, {
+          chats: arrayUnion({
+            chatID: newChatRef.id,
+            lastMessage: "",
+            receiverID: user.id,
+            updatedAt: new Date(),
+          }),
+        });
+      } else {
+        await setDoc(currentUserChatDocRef, {
+          chats: [
+            {
+              chatID: newChatRef.id,
+              lastMessage: "",
+              receiverID: user.id,
+              updatedAt: new Date(),
+            },
+          ],
+        });
+      }
   
       console.log("Chat created with ID:", newChatRef.id);
   
-      // Force re-render (optional)
-      setUsername(''); // Resetting state can help trigger a re-render in some cases.
+      // Reset username input
+      setUsername("");
   
     } catch (error) {
       console.error("Error adding user:", error);
     }
   };
+  
   
    console.log(user)
   return (
