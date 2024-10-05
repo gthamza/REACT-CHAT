@@ -1,13 +1,13 @@
-import React from 'react'
-import { ToastContainer } from 'react-toastify'
-import "react-toastify/dist/ReactToastify.css"
+import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Notification() {
   return (
-    <div className=''>
-     <ToastContainer position={'bottom-right'} theme={'dark'}></ToastContainer>
+    <div className="">
+      <ToastContainer position={"bottom-right"} theme={"dark"}></ToastContainer>
     </div>
-  )
+  );
 }
 
-export default Notification
+export default Notification;

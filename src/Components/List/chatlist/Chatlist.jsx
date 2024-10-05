@@ -1,19 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import './chatlist.css';
 import Adduser from './adduser/Adduser';
 import useUserStore from '../../../lib/userStore';
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
-import { db } from '../../../lib/firebase'; // Import Firebase instance
+import { db } from '../../../lib/firebase';
 
 function Chatlist() {
   const [addModel, setAddModel] = useState(false); // State to toggle Adduser modal
   const [chats, setChats] = useState([]); // State to store chat data
 
-  const { currentUser } = useUserStore(); // Get the current user from the user store
+  const { currentUser } =
+  
+  useUserStore(); 
 
   // useEffect to fetch chat data whenever the currentUser changes
   useEffect(() => {
-    if (!currentUser?.id) return; // Exit if no current user ID
+    if (!currentUser?.id) return; 
 
     const unsub = onSnapshot(doc(db, "userchats", currentUser.id), async (chatDoc) => {
       if (chatDoc.exists()) {
@@ -68,6 +70,9 @@ function Chatlist() {
 
   console.log(chats); // Log the fetched chats for debugging
 
+  const handleSelect = async () =>{
+     
+  }
   return (
     <div className='Chatlist'>
       <div className="search">
@@ -78,12 +83,11 @@ function Chatlist() {
         <img
           src={addModel ? "./minus.png" : "./plus.png"}
           alt="Add/Remove"
-          className='add' 
-          onClick={() => setAddModel((prev) => !prev)} // Toggle the Adduser modal
+          className='add' onClick={() => setAddModel((prev) => !prev)} // Toggle the Adduser modal
         />
       </div>
       {chats.map((chat, index) => (
-  <div key={index} className="item">
+  <div key={index} className="item" onClick={()=>handleSelect(chat)}>
     <img src={chat.user?.avatar || "./avatar.png"} alt="Chat Avatar" />
     <div className="texts">
       {/* <span>{chat.user?.name || 'Hamza'}</span>  Check here */}
