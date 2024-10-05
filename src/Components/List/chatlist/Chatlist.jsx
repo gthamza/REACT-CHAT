@@ -1,19 +1,19 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './chatlist.css';
 import Adduser from './adduser/Adduser';
 import useUserStore from '../../../lib/userStore';
-import { doc, onSnapshot, getDoc } from "firebase/firestore";
+import useChatStore from '../../../lib/chatStore'; // Import useChatStore here
+import { doc, onSnapshot, getDoc, updateDoc } from "firebase/firestore";
 import { db } from '../../../lib/firebase';
 
 function Chatlist() {
   const [addModel, setAddModel] = useState(false); // State to toggle Adduser modal
   const [chats, setChats] = useState([]); // State to store chat data
-
-  const { currentUser } =
+  const [input, setInput] = useState(""); // State for search input
+  const { currentUser } = useUserStore();
+  const { chatId, changeChat } = useChatStore();
   
-  useUserStore(); 
-
-  // useEffect to fetch chat data whenever the currentUser changes
+  // Fetch chat data for the current user
   useEffect(() => {
     if (!currentUser?.id) return; 
 
@@ -21,33 +21,31 @@ function Chatlist() {
       if (chatDoc.exists()) {
         let items = chatDoc.data().chats;
 
-        // Check if chats exist and are valid
         if (!items) {
           console.error("No chats found.");
           return;
         }
 
         if (!Array.isArray(items)) {
-          items = Object.values(items); // Convert to array if not already
+          items = Object.values(items);
         }
 
         const promises = items.map(async (item) => {
           if (!item || !item.receiverID) {
-            return null; // Skip invalid items
+            return null;
           }
 
           try {
-            const userDocRef = doc(db, "users", item.receiverID); // Reference to the user's Firestore document
-            const userDocSnap = await getDoc(userDocRef); // Get the user's document
+            const userDocRef = doc(db, "users", item.receiverID);
+            const userDocSnap = await getDoc(userDocRef);
 
             if (!userDocSnap.exists()) {
               console.warn(`User document not found for ID: ${item.receiverID}`);
               return null;
             }
 
-            const user = userDocSnap.data(); // Fetch user data
+            const user = userDocSnap.data();
             return { ...item, user };
-
           } catch (error) {
             console.error(`Error fetching user data for ${item.receiverID}:`, error);
             return null;
@@ -55,8 +53,6 @@ function Chatlist() {
         });
 
         const chatData = await Promise.all(promises);
-
-        // Filter out any null results and sort the chat list by the latest update
         setChats(chatData.filter(chat => chat !== null).sort((a, b) => b.updatedAt - a.updatedAt));
       } else {
         console.error("No document found for the current user.");
@@ -64,41 +60,86 @@ function Chatlist() {
     });
 
     return () => {
-      unsub(); // Cleanup the onSnapshot listener when component unmounts
+      unsub();
     };
   }, [currentUser?.id]);
 
-  console.log(chats); // Log the fetched chats for debugging
+  const handleSelect = async (chat) => {
+    // Create a shallow copy of the current user's chats
+    const userChats = chats.map((item) => {
+      const { user, ...rest } = item; // Remove the `user` object as it's not part of the actual chat structure
+      return rest;
+    });
 
-  const handleSelect = async () =>{
-     
-  }
+    // Find the index of the selected chat
+    const chatIndex = userChats.findIndex((item) => item.chatID === chat.chatID);
+
+    if (chatIndex === -1) {
+      console.error("Chat not found");
+      return;
+    }
+
+    // Mark the chat as seen
+    userChats[chatIndex].isSeen = true;
+
+    const usersChatRef = doc(db, "userchats", currentUser.id);
+
+    try {
+      // Update Firestore with the modified chat data
+      await updateDoc(usersChatRef, {
+        chats: userChats,
+      });
+
+      // Change the active chat in the store
+      changeChat(chat.chatID, chat.user);
+    } catch (error) {
+      console.error("Error updating isSeen:", error);
+    }
+  };
+
+  // Filter chats based on the search input
+  const filteredChats = chats.filter((chat) => {
+    return chat.user?.username.toLowerCase().includes(input.toLowerCase());
+  });
+
   return (
     <div className='Chatlist'>
       <div className="search">
         <div className="searchbar">
           <img src="/search.png" alt="Search" />
-          <input type="text" placeholder='Search' />
+          <input
+            type="text"
+            placeholder='Search'
+            value={input}
+            onChange={(e) => setInput(e.target.value)} // Update input state with search text
+          />
         </div>
         <img
           src={addModel ? "./minus.png" : "./plus.png"}
           alt="Add/Remove"
-          className='add' onClick={() => setAddModel((prev) => !prev)} // Toggle the Adduser modal
+          className='add' 
+          onClick={() => setAddModel((prev) => !prev)}
         />
       </div>
-      {chats.map((chat, index) => (
-  <div key={index} className="item" onClick={()=>handleSelect(chat)}>
-    <img src={chat.user?.avatar || "./avatar.png"} alt="Chat Avatar" />
-    <div className="texts">
-      {/* <span>{chat.user?.name || 'Hamza'}</span>  Check here */}
-             <span>{chat.user?.username|| 'Hamza'}</span>
-      <p>{chat.lastMessage || 'No messages yet'}</p>
-    </div>
-  </div>
-))}
 
+      {filteredChats.map((chat, index) => (
+        <div
+          key={index}
+          className="item"
+          onClick={() => handleSelect(chat)}
+          style={{
+            backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
+          }}
+        >
+          <img src={chat.user?.avatar || "./avatar.png"} alt="Chat Avatar" />
+          <div className="texts">
+            <span>{chat.user?.username || 'Hamza'}</span>
+            <p>{chat?.text || 'No messages yet'}</p>
+          </div>
+        </div>
+      ))}
 
-      {addModel && <Adduser />} {/* Conditionally render Adduser component if addModel is true */}
+      {addModel && <Adduser />}
     </div>
   );
 }

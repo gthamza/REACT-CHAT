@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import List from "./Components/List/List";
 import Details from "./Components/Details/Details";
@@ -9,13 +8,15 @@ import Notification from "./Components/Notification/Notification";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import useUserStore from "./lib/userStore";
+import useChatStore from "./lib/chatStore";
 
 function App() {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+  const { chatId } = useChatStore(); // Get chatId from the store
 
+  // Fetch user info on auth state change
   useEffect(() => {
-    const Unsub =
-    onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchUserInfo(user?.uid);
       } else {
@@ -24,10 +25,9 @@ function App() {
     });
 
     return () => {
-      Unsub();
+      unsub();
     };
   }, [fetchUserInfo]);
-  console.log(currentUser);
 
   if (isLoading) return <div className="loading">Loading...</div>;
 
@@ -36,8 +36,8 @@ function App() {
       {currentUser ? (
         <>
           <List />
-          <Chat />
-          <Details />
+          {chatId && <Chat />} {/* Only render Chat when a chatId exists */}
+          {chatId && <Details />} {/* Only render Details when a chatId exists */}
         </>
       ) : (
         <Login />
