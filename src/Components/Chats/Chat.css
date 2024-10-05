@@ -159,6 +159,11 @@
     border-radius: 5px;
     border: none;
     font-size: 14px;
+
+    &:disabled{
+      background-color: #5183fe;
+      cursor: not-allowed;
+    }
   }
 }
 .chat .center {
@@ -183,3 +188,50 @@
     background-color: transparent; /* Make the track background transparent */
   }
 }
+.chat .center {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  /* Custom scrollbar for the center only */
+  &::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2); /* Light transparent color */
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent; /* Make the track background transparent */
+  }
+}
+
+.chat .message {
+  max-width: 70%; /* Adjust as necessary */
+  display: flex;
+  gap: 10px;
+}
+
+.chat .messageown {
+  align-self: flex-end; /* Align to the right for the current user */
+}
+
+.chat .messageown .texts {
+  background-color: #5183fe; /* Blue background for sent messages */
+  color: white; /* White text */
+  border-radius: 3px; /* Round the corners */
+  padding: 3px; /* Add some padding */
+}
+
+.chat .message .texts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+

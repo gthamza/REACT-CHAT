@@ -2,13 +2,35 @@ import React from "react";
 import "./Details.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import useUserStore from "../../lib/userStore";
+import useChatStore from "../../lib/chatStore";
+import { arrayRemove, arrayUnion, updateDoc } from "firebase/firestore";
 
 function Details() {
+
+  const {currentUser} = useUserStore()
+  const {chatId,user,isCurrentBlocked,isReceiverBlocked,changeBlock} = useChatStore()
+
+  const handleBlockUser = async() =>{
+    if(!user) return;
+
+    const userDocRef = doc(db,"users" ,currentUser.id);
+
+    try {
+      await updateDoc(userDocRef,{
+        blocked : isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id)
+      })
+      changeBlock()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="details">
       <div className="user">
-        <img src="./avatar.png" alt="" />
-        <h2>GT HAMZA</h2>
+        <img src={user?.avatar || "./avatar.png"} alt="" />
+        <h2>{user?.username}</h2>
         <p>Lorem ipsum dolor</p>
       </div>
 
@@ -86,7 +108,6 @@ function Details() {
             <img src="./arrowDown.png" alt="" />
           </div>
           <center>
-            <button>Blocked User</button>
           </center>
           <center>
             <button className="logout" onClick={() => auth.signOut()}>
