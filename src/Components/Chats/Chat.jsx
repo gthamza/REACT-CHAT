@@ -191,8 +191,9 @@ function Chat() {
           <input
             type="file"
             id="file"
-            style={{ display: "none" }}
+            style={{ display: "none",cursor:"pointer" }}
             onChange={handleImage}
+            
           />
           <img src="./camera.png" alt="Open Camera" />
           <img src="./mic.png" alt="Record Voice" />
@@ -202,6 +203,7 @@ function Chat() {
           placeholder="Type a message..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          
         />
         <button onClick={sendMessage}>Send</button>
       </div>
